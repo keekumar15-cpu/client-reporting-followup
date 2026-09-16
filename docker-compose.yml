@@ -1,0 +1,34 @@
+services:
+  app:
+    build: .
+    image: report-followups-app:latest
+    restart: unless-stopped
+    environment:
+      - DATABASE_URL=postgresql://reportsapp_user:${REPORTS_DB_PASSWORD}@postgresql-jld5-postgresql-1:5432/reportsdb
+      - SESSION_SECRET=${REPORTS_SESSION_SECRET}
+      - NODE_ENV=production
+      - ADMIN_USERNAME=admin
+      - ADMIN_PASSWORD_HASH=${REPORTS_ADMIN_PASSWORD_HASH}
+      - OWNER_ID=00000000-0000-0000-0000-000000000001
+      - DEFAULT_CURRENCY=USD
+      - PORT=4001
+    ports:
+      - "127.0.0.1:4001:4001"
+    networks:
+      - db_net
+      - web_net
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.report-followups.rule=Host(`reports.msaii.cloud`)
+      - traefik.http.routers.report-followups.tls=true
+      - traefik.http.routers.report-followups.entrypoints=web,websecure
+      - traefik.http.routers.report-followups.tls.certresolver=mytlschallenge
+      - traefik.http.services.report-followups.loadbalancer.server.port=4001
+
+networks:
+  db_net:
+    external: true
+    name: postgresql-jld5_default
+  web_net:
+    external: true
+    name: n8n_default

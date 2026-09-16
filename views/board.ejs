@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Client reporting follow-up board</title>
+  <link rel="stylesheet" href="/style.css" />
+</head>
+<body>
+  <header class="page-header">
+    <div>
+      <h1>Client reporting follow-up board</h1>
+      <p class="subtitle">One row per client per month. Overdue rows sit at the top, so the next chase is always the first one you see.</p>
+    </div>
+    <form method="POST" action="/logout" class="logout-form">
+      <span class="signed-in-as"><%= username %></span>
+      <button type="submit" class="link-button">Sign out</button>
+    </form>
+  </header>
+
+  <% if (error) { %>
+    <div class="banner banner-error"><%= error %></div>
+  <% } %>
+
+  <% if (hasRows && money) { %>
+    <section class="summary-strip">
+      <div class="summary-card">
+        <div class="summary-label">Not yet sent</div>
+        <div class="summary-value"><%= money.notYetSent %></div>
+        <div class="summary-hint">Reports still owed to clients. Work not yet delivered, so not money owed to you yet.</div>
+      </div>
+      <div class="summary-card">
+        <div class="summary-label">Sent, not paid</div>
+        <div class="summary-value"><%= money.sentNotPaid %></div>
+        <div class="summary-hint">Delivered and waiting on payment: reports sent or invoices unpaid.</div>
+      </div>
+    </section>
+
+    <div class="board-meta">
+      <%= rowCount %> month<%= rowCount === 1 ? '' : 's' %> on the board
+      <% if (overdueCount > 0) { %>
+        &nbsp;·&nbsp;<span class="overdue-marker"><%= overdueCount %> overdue</span>
+      <% } %>
+    </div>
+
+    <section class="row-list">
+      <% rows.forEach(function(row) { %>
+        <article class="row-card <%= row.is_overdue ? 'row-overdue' : '' %>">
+          <div class="row-main">
+            <div class="row-client"><%= row.client_name %></div>
+            <div class="row-period"><%= row.monthLabel %></div>
+            <div class="row-fee"><%= row.feeLabel %></div>
+            <div class="row-stage-pill stage-<%= row.stage.toLowerCase() %>"><%= row.stage %></div>
+            <% if (row.is_overdue) { %>
+              <div class="overdue-badge">Overdue</div>
+            <% } %>
+          </div>
+          <div class="row-due-label"><%= row.dueLabel %></div>
+          <div class="row-actions">
+            <% if (row.advanceLabel) { %>
+              <form method="POST" action="/rows/<%= row.id %>/advance">
+                <button type="submit" class="btn-advance"><%= row.advanceLabel %></button>
+              </form>
+            <% } %>
+            <% if (row.canUndo) { %>
+              <form method="POST" action="/rows/<%= row.id %>/undo">
+                <button type="submit" class="btn-undo">Undo</button>
+              </form>
+            <% } %>
+          </div>
+        </article>
+      <% }); %>
+    </section>
+  <% } else { %>
+    <section class="empty-state">
+      <h2>The table is empty</h2>
+      <p>Add a client below to start tracking their reporting obligations.</p>
+    </section>
+  <% } %>
+
+  <section class="add-client">
+    <h2>Add a reporting client</h2>
+    <form method="POST" action="/rows" class="add-form">
+      <label for="client_name">Client name</label>
+      <input type="text" id="client_name" name="client_name" required maxlength="120" />
+
+      <label for="report_month">Report month</label>
+      <input type="month" id="report_month" name="report_month" required />
+
+      <label for="fee">Fee (<%= process.env.DEFAULT_CURRENCY || 'USD' %>)</label>
+      <input type="number" id="fee" name="fee" min="0.01" step="0.01" required />
+
+      <label for="report_due_date">Report due date</label>
+      <input type="date" id="report_due_date" name="report_due_date" required />
+
+      <label for="payment_due_date">Payment due date (optional)</label>
+      <input type="date" id="payment_due_date" name="payment_due_date" />
+
+      <button type="submit">Add client</button>
+    </form>
+  </section>
+
+  <footer class="page-footer">
+    Rows live in report_followups. Stages: Due, Sent, Invoiced, Paid. Undo moves a row back one stage to fix a wrong click.
+  </footer>
+</body>
+</html>

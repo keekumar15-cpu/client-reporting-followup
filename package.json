@@ -1,0 +1,21 @@
+{
+  "name": "report-followups",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Client Reporting Follow-up Board",
+  "main": "src/app.js",
+  "scripts": {
+    "start": "node src/app.js"
+  },
+  "dependencies": {
+    "express": "^4.19.2",
+    "ejs": "^3.1.10",
+    "express-session": "^1.18.0",
+    "connect-pg-simple": "^9.0.1",
+    "pg": "^8.12.0",
+    "bcryptjs": "^2.4.3"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}
