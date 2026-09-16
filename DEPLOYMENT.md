@@ -1,9 +1,20 @@
 # Deployment plan — Client Reporting Follow-up Board
 
-This app is built and locally verified (see "What's been tested" below). It is
-not yet deployed — that step needs the Hostinger VPS connector active in a
-chat session. Once it is, this is the exact plan to execute, reusing the same
-VPS, Postgres instance and Traefik proxy as the Rent Tracker app.
+**Source of truth:** https://github.com/keekumar15-cpu/client-reporting-followup
+(private repo). Includes a `Dockerfile` and `docker-compose.yml` already
+configured to join this VPS's existing Postgres and Traefik networks.
+
+This app is built, locally verified (see "What's been tested" below), and
+pushed to GitHub. It is not yet deployed to the VPS — that step needs the
+Hostinger VPS connector active in a chat session. Once it is, this is the
+exact plan to execute, reusing the same VPS, Postgres instance and Traefik
+proxy as the Rent Tracker app.
+
+**Since the repo is private**, the VPS will need read access to clone it at
+build time — either a short-lived, `Contents: Read`-only deploy token used
+once in the `docker-compose.yml` build context on the VPS (not committed to
+the repo), or the repo can be made public if you'd rather skip that step.
+This decision happens at deploy time, once the connector is live.
 
 ## Target environment (reusing what's already on the VPS)
 
